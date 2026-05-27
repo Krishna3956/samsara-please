@@ -217,9 +217,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(20px) grayscale(1);
-    -webkit-backdrop-filter: blur(20px) grayscale(1);
-    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px) grayscale(0.5);
+    -webkit-backdrop-filter: blur(6px) grayscale(0.5);
+    background: rgba(0,0,0,0.4);
     transition: opacity 0.6s ease, visibility 0.6s ease;
   }
   .lock-overlay.unlocked {
@@ -323,11 +323,10 @@
 <!-- LOCK SCREEN -->
 <div class="lock-overlay" id="lockOverlay">
   <div class="lock-box">
-    <div class="lock-icon">🔒</div>
-    <div class="lock-title">this presentation is locked</div>
+    <div class="lock-icon">🫣</div>
+    <div class="lock-title">arre samsara, came back for more?</div>
     <div class="lock-subtitle">
-      if you're here again, tell me you're missing me.<br>
-      I'll send you the password.
+      Text me that you miss me and maybe I'll give you the password 😌
     </div>
     <div class="lock-input-wrap">
       <input type="password" class="lock-input" id="lockInput" placeholder="••••••••" maxlength="10" autocomplete="off">
