@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Samsara, Please. 🙏</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+    background: #111;
+  }
+
+  .deck {
+    display: flex;
+    width: 100%; height: 100%;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .slide {
+    min-width: 100vw; min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 60px 80px;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .slide * { position: relative; z-index: 2; }
+
+  /* ---- typography ---- */
+  .big   { font-size: clamp(2.2rem,5vw,4.5rem); font-weight: 900; line-height: 1.15; }
+  .med   { font-size: clamp(1.4rem,3vw,2.6rem); font-weight: 700; line-height: 1.3; }
+  .small { font-size: clamp(1rem,1.8vw,1.5rem); font-weight: 400; line-height: 1.6; }
+  .tiny  { font-size: clamp(0.75rem,1.2vw,1rem); font-weight: 400; opacity: 0.7; }
+  .hand  { font-family: 'Caveat', cursive; }
+  .strike { text-decoration: line-through; opacity: 0.5; }
+  .highlight { background: rgba(255,255,255,0.2); border-radius: 8px; padding: 2px 12px; }
+
+  /* ---- sticker emojis ---- */
+  .sticker {
+    position: absolute; z-index: 1;
+    font-size: clamp(1.8rem,3.5vw,3.2rem);
+    animation: float 4s ease-in-out infinite;
+    opacity: 0.55;
+    pointer-events: none;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+  }
+  .sticker.s1 { top:4%; left:3%; animation-delay:0s; }
+  .sticker.s2 { top:6%; right:4%; animation-delay:1s; }
+  .sticker.s3 { bottom:5%; left:4%; animation-delay:2s; }
+  .sticker.s4 { bottom:6%; right:3%; animation-delay:0.5s; }
+  .sticker.s5 { top:18%; left:2%; animation-delay:1.5s; }
+  .sticker.s6 { top:20%; right:2%; animation-delay:2.5s; }
+  .sticker.s7 { bottom:18%; left:50%; animation-delay:3s; }
+
+  @keyframes float {
+    0%,100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-14px) rotate(5deg); }
+  }
+
+  /* ---- slide backgrounds ---- */
+  .bg-coral    { background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: #fff; }
+  .bg-purple   { background: linear-gradient(135deg, #a29bfe, #6c5ce7); color: #fff; }
+  .bg-yellow   { background: linear-gradient(135deg, #ffeaa7, #fdcb6e); color: #2d3436; }
+  .bg-blue     { background: linear-gradient(135deg, #74b9ff, #0984e3); color: #fff; }
+  .bg-red      { background: linear-gradient(135deg, #ff7675, #d63031); color: #fff; }
+  .bg-green    { background: linear-gradient(135deg, #55efc4, #00b894); color: #2d3436; }
+  .bg-lavender { background: linear-gradient(135deg, #dfe6e9, #b2bec3); color: #2d3436; }
+  .bg-orange   { background: linear-gradient(135deg, #fab1a0, #e17055); color: #fff; }
+  .bg-teal     { background: linear-gradient(135deg, #81ecec, #00cec9); color: #2d3436; }
+  .bg-pink     { background: linear-gradient(135deg, #fd79a8, #e84393); color: #fff; }
+  .bg-cream    { background: linear-gradient(135deg, #ffecd2, #fcb69f); color: #2d3436; }
+  .bg-brown    { background: linear-gradient(135deg, #c4a882, #8d6e4c); color: #fff; }
+  .bg-gold     { background: linear-gradient(135deg, #f9ca24, #f0932b); color: #2d3436; }
+  .bg-silver   { background: linear-gradient(135deg, #dfe6e9, #636e72); color: #fff; }
+  .bg-gradient { background: linear-gradient(135deg, #fd79a8, #a29bfe, #74b9ff); color: #fff; }
+  .bg-warm     { background: linear-gradient(135deg, #ff9a9e, #fecfef, #fdfcfb); color: #2d3436; }
+  .bg-dark     { background: linear-gradient(135deg, #2d3436, #0a0a0a); color: #fff; }
+  .bg-mint     { background: linear-gradient(135deg, #b8f5e4, #38ef7d); color: #2d3436; }
+  .bg-softpink { background: linear-gradient(135deg, #fce4ec, #f8bbd0); color: #2d3436; }
+  .bg-deeppurple { background: linear-gradient(135deg, #4a148c, #7b1fa2); color: #fff; }
+  .bg-sunset   { background: linear-gradient(135deg, #f093fb, #f5576c); color: #fff; }
+
+  /* ---- content helpers ---- */
+  .list-left { text-align: left; display: inline-block; }
+  .list-left li { margin-bottom: 10px; }
+  .gap { height: 20px; }
+  .gap-sm { height: 10px; }
+  .mt { margin-top: 24px; }
+  .mb { margin-bottom: 24px; }
+
+  .rating {
+    display: inline-block;
+    background: rgba(0,0,0,0.15);
+    border-radius: 20px;
+    padding: 2px 14px;
+    font-size: 0.85em;
+    margin-left: 8px;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px 40px;
+    margin-top: 20px;
+    max-width: 700px;
+  }
+
+  .bottle-row {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    font-size: clamp(2.5rem,5vw,4.5rem);
+    margin: 20px 0;
+  }
+
+  .vs-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+  .vs-item {
+    background: rgba(255,255,255,0.15);
+    border-radius: 16px;
+    padding: 20px 30px;
+    font-size: clamp(1rem,2vw,1.4rem);
+    font-weight: 600;
+  }
+  .vs-divider {
+    font-size: 2rem; font-weight: 900;
+  }
+
+  .promise-item {
+    background: rgba(255,255,255,0.12);
+    border-radius: 14px;
+    padding: 14px 24px;
+    margin: 8px 0;
+    font-size: clamp(0.95rem,1.6vw,1.25rem);
+    text-align: left;
+    max-width: 650px;
+  }
+
+  /* ---- progress bar ---- */
+  .progress-bar {
+    position: fixed; top: 0; left: 0;
+    height: 4px;
+    background: rgba(255,255,255,0.8);
+    z-index: 999;
+    transition: width 0.4s ease;
+  }
+
+  /* ---- slide counter ---- */
+  .counter {
+    position: fixed;
+    bottom: 20px; right: 30px;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.6);
+    z-index: 999;
+    font-family: 'Poppins', sans-serif;
+    pointer-events: none;
+  }
+
+  /* ---- nav hint ---- */
+  .nav-hint {
+    position: fixed;
+    bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.5);
+    z-index: 999;
+    pointer-events: none;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:0.5; }
+    50% { opacity:1; }
+  }
+
+  /* ---- entry animation ---- */
+  .slide-content { opacity: 0; transform: translateY(30px); transition: all 0.6s ease 0.2s; }
+  .slide.active .slide-content { opacity: 1; transform: translateY(0); }
+
+  /* ---- bounce on sticker for active ---- */
+  .slide.active .sticker { animation: float 4s ease-in-out infinite; }
+
+  .bottle-img {
+    width: clamp(100px,15vw,180px);
+    height: auto;
+    border-radius: 12px;
+    filter: drop-shadow(0 8px 20px rgba(0,0,0,0.25));
+    object-fit: contain;
+    opacity: 1 !important;
+    z-index: 3 !important;
+  }
+
+  @media (max-width: 768px) {
+    .slide { padding: 40px 30px; }
+    .sticker { font-size: clamp(2rem,8vw,3.5rem); }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="counter" id="counter"></div>
+<div class="nav-hint" id="navHint">tap or press → to continue</div>
+
+<div class="deck" id="deck">
+
+  <!-- SLIDE 1 — TITLE -->
+  <div class="slide bg-coral" id="slide-0">
+    <img src="LCIN01744.webp" class="sticker s1 bottle-img" alt="samsara">
+    <img src="LCIN01744.webp" class="sticker s2 bottle-img" alt="samsara">
+    <img src="LCIN01744.webp" class="sticker s3 bottle-img" alt="samsara">
+    <img src="LCIN01744.webp" class="sticker s4 bottle-img" alt="samsara">
+    <div class="slide-content">
+      <div class="big hand" style="font-size:clamp(2.8rem,6vw,5rem); font-weight:700;">hey samsara 👋</div>
+      <div class="gap"></div>
+      <div class="med hand" style="opacity:0.8;">my EQ is so low</div>
+      <div class="med hand" style="opacity:0.8;">I had to make a PowerPoint to apologize</div>
+      <div class="gap"></div>
+      <div class="tiny">tap anywhere or press → to continue</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2 — SO YOU'RE MAD -->
+  <div class="slide bg-purple">
+    <span class="sticker s1">😤</span>
+    <span class="sticker s2">🥲</span>
+    <span class="sticker s3">🙃</span>
+    <span class="sticker s4">💀</span>
+    <span class="sticker s5">😮‍💨</span>
+    <span class="sticker s6">🫣</span>
+    <div class="slide-content">
+      <div class="big">so... you're mad at me</div>
+      <div class="gap"></div>
+      <div class="med" style="font-size:6rem;">🫠</div>
+      <div class="gap"></div>
+      <div class="med hand">valid. totally valid.</div>
+      <div class="gap-sm"></div>
+      <div class="med hand" style="font-size:clamp(1.8rem,3.5vw,3rem);">BUT—</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3 — THE FEEDBACK -->
+  <div class="slide bg-yellow">
+    <span class="sticker s1">📋</span>
+    <span class="sticker s2">�</span>
+    <span class="sticker s3">🤡</span>
+    <span class="sticker s4">�</span>
+    <span class="sticker s6">💔</span>
+    <div class="slide-content">
+      <div class="big">you said some things 🫠</div>
+      <div class="gap"></div>
+      <div class="card" style="color:#2d3436;">
+        <div class="small list-left">
+          <div>❌ "no non-money-making hobbies" <span class="rating">ouch</span></div>
+          <div class="gap-sm"></div>
+          <div>❌ "doesn't eat healthy" <span class="rating">rude</span></div>
+          <div class="gap-sm"></div>
+          <div>❌ "low EQ" <span class="rating">RUDE</span></div>
+          <div class="gap-sm"></div>
+          <div>❌ "not practical" <span class="rating">ok maybe</span></div>
+          <div class="gap-sm"></div>
+          <div>❌ "thinks about money 24/7" <span class="rating">lies</span></div>
+          <div class="gap-sm"></div>
+          <div>❌ "doesn't work out" <span class="rating">slander</span></div>
+          <div class="gap-sm"></div>
+          <div>❌ "doesn't drink water" <span class="rating">DEFAMATION</span></div>
+        </div>
+      </div>
+      <div class="gap-sm"></div>
+      <div class="small hand">let's address these. one by one. 🧑‍⚖️</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4 — WATER BOTTLES -->
+  <div class="slide bg-red">
+    <span class="sticker s1">🚨</span>
+    <span class="sticker s2">🚨</span>
+    <span class="sticker s3">🧴</span>
+    <span class="sticker s4">💦</span>
+    <span class="sticker s5">💧</span>
+    <span class="sticker s6">💧</span>
+    <span class="sticker s7">⚖️</span>
+    <div class="slide-content">
+      <div class="big">THE WATER BOTTLE SCANDAL</div>
+      <div class="gap"></div>
+      <div class="med hand">"I haven't seen a single bottle in your room"</div>
+      <div class="gap"></div>
+      <div class="bottle-row">🍶🍶🍶🍶🧴🧴</div>
+      <div class="big">SIX. BOTTLES.</div>
+      <div class="gap-sm"></div>
+      <div class="med hand">the investigation was FLAWED, your honor 🫡</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5 — NO HOBBIES -->
+  <div class="slide bg-green">
+    <span class="sticker s1">🎨</span>
+    <span class="sticker s2">🎭</span>
+    <span class="sticker s3">🖌️</span>
+    <span class="sticker s4">💸</span>
+    <span class="sticker s5">🤹</span>
+    <span class="sticker s6">🎯</span>
+    <div class="slide-content">
+      <div class="big">"no non-money-making hobbies"</div>
+      <div class="gap"></div>
+      <div class="med">I just spent HOURS making this powerpoint.</div>
+      <div class="gap-sm"></div>
+      <div class="med hand">for FREE.</div>
+      <div class="gap"></div>
+      <div class="card" style="color:#2d3436;">
+        <div class="small">revenue generated from this PPT: <strong>₹0</strong></div>
+        <div class="small">hobby acquired: <strong>✅</strong></div>
+        <div class="small">sanity remaining: <strong>questionable</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6 — LOW EQ -->
+  <div class="slide bg-lavender">
+    <span class="sticker s1">🎬</span>
+    <span class="sticker s2">�</span>
+    <span class="sticker s3">🧠</span>
+    <span class="sticker s4">🤌</span>
+    <span class="sticker s5">💅</span>
+    <span class="sticker s6">🎭</span>
+    <div class="slide-content">
+      <div class="big">"low EQ" 🤨</div>
+      <div class="gap"></div>
+      <div class="med">I literally named you</div>
+      <div class="med" style="font-size:clamp(2rem,4vw,3.5rem); font-weight:900;">SAMSARA</div>
+      <div class="med">after a drink.</div>
+      <div class="gap-sm"></div>
+      <div class="med hand">because it felt romantic.</div>
+      <div class="gap"></div>
+      <div class="med">that's not low EQ.</div>
+      <div class="med" style="font-size:clamp(1.8rem,3.5vw,3rem); font-weight:900;">that's CINEMA. 🎬</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7 — DOESN'T EAT HEALTHY -->
+  <div class="slide bg-orange">
+    <span class="sticker s1">🫓</span>
+    <span class="sticker s2">🍛</span>
+    <span class="sticker s3">🥘</span>
+    <span class="sticker s4">🥗</span>
+    <span class="sticker s5">🤷</span>
+    <span class="sticker s6">�</span>
+    <div class="slide-content">
+      <div class="big">"doesn't eat healthy"</div>
+      <div class="gap"></div>
+      <div class="med hand">ok this one might be slightly valid</div>
+      <div class="gap"></div>
+      <div class="med">but in my defense—</div>
+      <div class="gap-sm"></div>
+      <div class="small">1. babai tiffin's dosa had vegetables (onions) in it???</div>
+      <div class="small">2. mogu mogu had fruits (lychee) in it???</div>
+      <div class="gap"></div>
+      <div class="small">also imli chutney is basically a fruit.</div>
+      <div class="small" style="font-weight:700;">checkmate. 🫡</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8 — MONEY -->
+  <div class="slide bg-teal">
+    <span class="sticker s1">💰</span>
+    <span class="sticker s2">�</span>
+    <span class="sticker s3">🧠</span>
+    <span class="sticker s4">🪙</span>
+    <span class="sticker s5">📈</span>
+    <span class="sticker s6">🤑</span>
+    <div class="slide-content">
+      <div class="big">"thinks about money 24/7"</div>
+      <div class="gap"></div>
+      <div class="med">things I'm currently thinking about:</div>
+      <div class="gap-sm"></div>
+      <div class="card" style="color:#2d3436; text-align:left;">
+        <div class="med"><span class="strike">money</span></div>
+        <div class="med"><span class="strike">stonks</span></div>
+        <div class="med"><span class="strike">revenue</span></div>
+        <div class="med" style="font-weight:900; white-space:nowrap; font-size:clamp(1rem,2.2vw,2rem);">how to get you to look at me like before</div>
+        <div class="med" style="font-weight:900;">this powerpoint</div>
+        <div class="med" style="font-weight:900;">you</div>
+      </div>
+      <div class="gap"></div>
+      <div class="small hand">revenue from all of the above: ₹0 💅</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 9 — DOESN'T WORK OUT -->
+  <div class="slide bg-pink">
+    <span class="sticker s1">⏰</span>
+    <span class="sticker s2">🏋️</span>
+    <span class="sticker s3">🧘</span>
+    <span class="sticker s4">😵</span>
+    <span class="sticker s5">💪</span>
+    <span class="sticker s6">🏃</span>
+    <div class="slide-content">
+      <div class="big">"doesn't work out" 🏋️</div>
+      <div class="gap"></div>
+      <div class="med">my fingers are getting a WORKOUT</div>
+      <div class="med">typing this presentation rn</div>
+      <div class="gap"></div>
+      <div style="font-size:6rem;">��</div>
+      <div class="gap"></div>
+      <div class="med hand">does making slides count as cardio? asking for me. 🙂</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10 — TRANSITION -->
+  <div class="slide bg-warm">
+    <span class="sticker s1">🌸</span>
+    <span class="sticker s2">✨</span>
+    <span class="sticker s3">�</span>
+    <span class="sticker s4">🥹</span>
+    <span class="sticker s5">🫧</span>
+    <span class="sticker s6">💖</span>
+    <div class="slide-content">
+      <div class="big">ok but can we talk about</div>
+      <div class="big">the good stuff? 🥹</div>
+      <div class="gap"></div>
+      <div class="med hand">because two weeks ago, something happened...</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 11 — FF21 TERRACE -->
+  <div class="slide bg-softpink">
+    <span class="sticker s1">💘</span>
+    <span class="sticker s2">🌃</span>
+    <span class="sticker s3">🌠</span>
+    <span class="sticker s4">🌙</span>
+    <span class="sticker s5">💕</span>
+    <span class="sticker s6">🫠</span>
+    <div class="slide-content">
+      <div class="med">two PMs.</div>
+      <div class="med">one terrace.</div>
+      <div class="med" style="font-weight:900;">zero idea what was coming.</div>
+      <div class="gap"></div>
+      <div class="med hand">you were right there the whole time. two floors away. 👀</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 12 — LICK ICE CREAM -->
+  <div class="slide bg-cream">
+    <span class="sticker s1">🍦</span>
+    <span class="sticker s2">🍦</span>
+    <span class="sticker s3">🍨</span>
+    <span class="sticker s4">🍨</span>
+    <span class="sticker s5">🍦</span>
+    <span class="sticker s6">🍦</span>
+    <span class="sticker s7">🤤</span>
+    <div class="slide-content">
+      <div class="big">lick ice cream. twice. 🍦🍦</div>
+      <div class="gap"></div>
+      <div class="med">we BOTH love lick.</div>
+      <div class="gap-sm"></div>
+      <div class="med hand">that's not a coincidence.</div>
+      <div class="med hand">that's the universe conspiring. ✨</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 13 — TEA -->
+  <div class="slide bg-brown">
+    <span class="sticker s1">☕</span>
+    <span class="sticker s2">🍵</span>
+    <span class="sticker s3">☕</span>
+    <span class="sticker s4">🍵</span>
+    <span class="sticker s7">🫖</span>
+    <div class="slide-content">
+      <div class="big">shelby's barista ☕</div>
+      <div class="big">+ tea day 🍵</div>
+      <div class="gap"></div>
+      <div class="med">you and tea is the most stable</div>
+      <div class="med">relationship I've ever witnessed</div>
+      <div class="gap"></div>
+      <div class="med hand">we went to tea day like a million times</div>
+      <div class="gap-sm"></div>
+      <div class="med hand" style="font-size:clamp(1.6rem,3vw,2.8rem);">I'd go a million more ☕💛</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 14 — BABAI TIFFINS -->
+  <div class="slide bg-gold">
+    <span class="sticker s1">🫓</span>
+    <span class="sticker s2">🤤</span>
+    <span class="sticker s3">🤌</span>
+    <span class="sticker s4">🤤</span>
+    <span class="sticker s5">🌶️</span>
+    <span class="sticker s6">😍</span>
+    <div class="slide-content">
+      <div class="big">babai tiffin's. twice.</div>
+      <div class="gap"></div>
+      <div class="med">the way you look at imli chutney... 🥹</div>
+      <div class="gap-sm"></div>
+      <div class="med hand">it's better than the way you look at me</div>
+      <div class="gap"></div>
+      <div class="med">and honestly?</div>
+      <div class="med" style="font-weight:900;">I get it. that chutney hits different.</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 15 — GODREJ -->
+  <div class="slide bg-blue">
+    <span class="sticker s1">🏠</span>
+    <span class="sticker s2">🔑</span>
+    <span class="sticker s3">🏡</span>
+    <span class="sticker s4">🏗️</span>
+    <span class="sticker s5">💫</span>
+    <span class="sticker s6">🌟</span>
+    <div class="slide-content">
+      <div class="big">godrej lakeside orchard 🏠</div>
+      <div class="gap"></div>
+      <div class="med">I showed you the flat.</div>
+      <div class="gap-sm"></div>
+      <div class="med">you didn't run away.</div>
+      <div class="gap"></div>
+      <div class="med hand" style="font-size:clamp(1.8rem,3.5vw,3rem);">I consider this a MASSIVE W. 🏆</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 16 — SHELL SELECT -->
+  <div class="slide bg-silver">
+    <span class="sticker s1">⛽</span>
+    <span class="sticker s2">🥥</span>
+    <span class="sticker s3">🍇</span>
+    <span class="sticker s4">🧃</span>
+    <span class="sticker s5">🥤</span>
+    <span class="sticker s6">💜</span>
+    <div class="slide-content">
+      <div class="big">shell select ⛽</div>
+      <div class="gap"></div>
+      <div class="vs-row">
+        <div class="vs-item">you: coconut water 🥥</div>
+        <div class="vs-divider">×</div>
+        <div class="vs-item">me: mogu mogu 🍇</div>
+      </div>
+      <div class="gap"></div>
+      <div class="med">different drinks. same vibe.</div>
+      <div class="gap-sm"></div>
+      <div class="med hand" style="font-size:clamp(1.6rem,3vw,2.8rem);">that's literally us. 💫</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 17 — WHY WE WORK -->
+  <div class="slide bg-gradient">
+    <span class="sticker s1">💜</span>
+    <span class="sticker s2">🧩</span>
+    <span class="sticker s3">🤝</span>
+    <span class="sticker s4">🔮</span>
+    <span class="sticker s5">✨</span>
+    <span class="sticker s6">💖</span>
+    <div class="slide-content">
+      <div class="big">why we just... work</div>
+      <div class="gap"></div>
+      <div class="card" style="color:#2d3436; text-align:left;">
+        <div class="small">✅ both PMs <span class="hand">(we speak the same language of suffering)</span></div>
+        <div class="gap-sm"></div>
+        <div class="small">✅ live in the same building <span class="hand">(the universe really said no excuses)</span></div>
+        <div class="gap-sm"></div>
+        <div class="small">✅ both love lick <span class="hand">(soulmate behavior)</span></div>
+        <div class="gap-sm"></div>
+        <div class="small">✅ survived babai tiffin's twice <span class="hand">(bonded for life)</span></div>
+        <div class="gap-sm"></div>
+        <div class="small">✅ you love tea. I love... <span class="hand">you loving tea 🫶</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 18 — PROMISES -->
+  <div class="slide bg-mint">
+    <span class="sticker s1">🤞</span>
+    <span class="sticker s2">📝</span>
+    <span class="sticker s3">�</span>
+    <span class="sticker s4">🫡</span>
+    <span class="sticker s5">🌟</span>
+    <span class="sticker s6">🙏</span>
+    <div class="slide-content">
+      <div class="big">my promises 🤞</div>
+      <div class="gap"></div>
+      <div class="promise-item">💧 will hydrate VISIBLY <span class="hand">(bottles will be displayed prominently)</span></div>
+      <div class="promise-item">🎨 will develop a non-money-making hobby <span class="hand">(this PPT is #1)</span></div>
+      <div class="promise-item">🥦 will eat a vegetable <span class="hand">(once. maybe twice if you're nice)</span></div>
+      <div class="promise-item">🧠 will work on EQ <span class="hand">(step 1: googled "what is empathy")</span></div>
+      <div class="promise-item">💭 will think about something other than money <span class="hand">...like you 🥲</span></div>
+      <div class="promise-item">💪 will work out <span class="hand">(does carrying emotional baggage count?)</span></div>
+    </div>
+  </div>
+
+  <!-- SLIDE 19 — THE TRUTH -->
+  <div class="slide bg-deeppurple">
+    <span class="sticker s1">💜</span>
+    <span class="sticker s2">🌙</span>
+    <span class="sticker s3">🫠</span>
+    <span class="sticker s4">💖</span>
+    <span class="sticker s5">✨</span>
+    <span class="sticker s6">🧡</span>
+    <div class="slide-content">
+      <div class="med hand">the truth is...</div>
+      <div class="gap"></div>
+      <div class="big">two weeks.</div>
+      <div class="med">that's all it took.</div>
+      <div class="gap"></div>
+      <div class="med hand" style="font-size:clamp(1.5rem,2.8vw,2.4rem);">you're the samsara to my mogu mogu 🥤</div>
+      <div class="gap-sm"></div>
+      <div class="med hand" style="font-size:clamp(1.5rem,2.8vw,2.4rem);">the imli chutney to my dosa 🫓</div>
+      <div class="gap"></div>
+      <div class="big" style="font-size:clamp(2.5rem,5vw,4rem);">we deserve to be together.</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 20 — THE ASK -->
+  <div class="slide bg-sunset">
+    <span class="sticker s1">🙏</span>
+    <span class="sticker s2">💌</span>
+    <span class="sticker s3">🙏</span>
+    <span class="sticker s4">💌</span>
+    <span class="sticker s5">🥺</span>
+    <span class="sticker s6">🥺</span>
+    <div class="slide-content">
+      <div class="big">so...</div>
+      <div class="gap"></div>
+      <div class="med">can we go back to how it was?</div>
+      <div class="gap-sm"></div>
+      <div class="med">the laughing. the hugs. the us.</div>
+      <div class="gap-sm"></div>
+      <div class="med">I miss that. I miss you.</div>
+      <div class="gap"></div>
+      <div class="med hand" style="font-size:clamp(1.8rem,3.5vw,3rem);">give me one more chance to not be dumb 🙏</div>
+      <div class="gap"></div>
+      <div class="gap"></div>
+      <div class="tiny hand" style="font-size:clamp(0.9rem,1.4vw,1.1rem); opacity:0.8;">
+        made with ❤️, zero EQ, and six water bottles as witnesses
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const deck = document.getElementById('deck');
+  const slides = document.querySelectorAll('.slide');
+  const progressBar = document.getElementById('progressBar');
+  const counter = document.getElementById('counter');
+  const navHint = document.getElementById('navHint');
+  let current = 0;
+  const total = slides.length;
+
+  function goTo(n) {
+    if (n < 0 || n >= total) return;
+    current = n;
+    deck.style.transform = `translateX(-${current * 100}vw)`;
+    progressBar.style.width = `${((current + 1) / total) * 100}%`;
+    counter.textContent = `${current + 1} / ${total}`;
+    slides.forEach((s, i) => s.classList.toggle('active', i === current));
+    if (current > 0) navHint.style.display = 'none';
+  }
+
+  function next() { goTo(current + 1); }
+  function prev() { goTo(current - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+  });
+
+  document.addEventListener('click', e => {
+    const x = e.clientX;
+    if (x > window.innerWidth * 0.3) next();
+    else prev();
+  });
+
+  // touch support
+  let touchStartX = 0;
+  document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+  document.addEventListener('touchend', e => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) { diff > 0 ? next() : prev(); }
+  });
+
+  goTo(0);
+</script>
+
+</body>
+</html>
